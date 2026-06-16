@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroStock - Ventas</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .resumen-venta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .resumen-venta h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .resumen-venta .total {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .producto-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .producto-info p {
+            margin: 5px 0;
+        }
+        
+        .ganancia {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .venta-realizada {
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+        
+        .fecha-filtro {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .fecha-filtro .form-group {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        
+        .total-ventas-card {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <h2>ElectroStock</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="/dashboard" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/proveedores" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Proveedores</span>
+                </a>
+                <a href="/tiendas" class="nav-item">
+                    <i class="fas fa-store"></i>
+                    <span>Tiendas</span>
+                </a>
+                <a href="/productos" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+                <a href="/ventas" class="nav-item active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="/analisis" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Análisis</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1><i class="fas fa-shopping-cart"></i> Ventas</h1>
+                <div class="header-info">
+                    <span id="fecha-actual"></span>
+                    <span class="estado" id="estado-api">
+                        <i class="fas fa-circle"></i> Conectado
+                    </span>
+                </div>
+            </header>
+
+            <!-- Formulario de venta -->
+            <div class="form-card">
+                <h3><i class="fas fa-cash-register"></i> Registrar Nueva Venta</h3>
+                <form id="formVenta">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-store"></i> Tienda *</label>
+                            <select id="tienda_id" required>
+                                <option value="">Seleccionar tienda</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-box"></i> Producto *</label>
+                            <select id="producto_id" required disabled>
+                                <option value="">Primero seleccione una tienda</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="producto-info" class="producto-info" style="display: none;">
+                        <p><strong><i class="fas fa-info-circle"></i> Información del Producto</strong></p>
+                        <p>💰 Precio: $<span id="precio-producto">0.00</span></p>
+                        <p>📦 Stock disponible: <span id="stock-producto">0</span> unidades</p>
+                        <p>📈 Ganancia por unidad: $<span id="ganancia-unidad">0.00</span></p>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Fecha</label>
+                            <input type="date" id="fecha" value="">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-hashtag"></i> Cantidad *</label>
+                            <input type="number" id="cantidad" min="1" placeholder="Cantidad" required>
+                        </div>
+                    </div>
+                    
+                    <div class="resumen-venta" id="resumen-venta" style="display: none;">
+                        <h3><i class="fas fa-receipt"></i> Resumen de la Venta</h3>
+                        <p>Producto: <strong id="resumen-producto"></strong></p>
+                        <p>Cantidad: <span id="resumen-cantidad"></span></p>
+                        <p>Total: <span class="total">$<span id="resumen-total">0.00</span></span></p>
+                        <p>Ganancia estimada: $<span id="resumen-ganancia">0.00</span></p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="btnRegistrar" style="margin-top: 20px;">
+                        <i class="fas fa-check-circle"></i> Registrar Venta
+                    </button>
+                </form>
+            </div>
+
+            <!-- Filtros de historial -->
+            <div class="card" style="padding: 20px; background: white; border-radius: 12px; margin-bottom: 20px;">
+                <h4><i class="fas fa-filter"></i> Filtrar Historial de Ventas</h4>
+                <div class="fecha-filtro">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Desde</label>
+                        <input type="date" id="fecha_desde">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Hasta</label>
+                        <input type="date" id="fecha_hasta">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-store"></i> Tienda</label>
+                        <select id="filtro_tienda">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                    <button id="btnFiltrar" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button id="btnLimpiar" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Totales del filtro -->
+            <div id="totales-filtro" class="total-ventas-card" style="display: none;">
+                <h4><i class="fas fa-chart-line"></i> Totales del período</h4>
+                <div class="form-row">
+                    <div class="form-group">
+                        <p>💰 Total Ventas: <strong>$<span id="total-ventas-filtro">0.00</span></strong></p>
+                    </div>
+                    <div class="form-group">
+                        <p>📈 Total Ganancias: <strong>$<span id="total-ganancias-filtro">0.00</span></strong></p>
+                    </div>
+                    <div class="form-group">
+                        <p>📦 Unidades Vendidas: <strong id="total-unidades-filtro">0</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de ventas -->
+            <div class="table-card">
+                <h3><i class="fas fa-history"></i> Historial de Ventas</h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="ventas-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Tienda</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                                <th>Ganancia</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ventas-body">
+                            <tr><td colspan="8" style="text-align: center;">Cargando ventas...</td</tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para confirmar eliminación -->
+    <div id="modalEliminar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar esta venta?</p>
+                <p id="venta-info" style="font-weight: bold; margin-top: 10px;"></p>
+                <p class="warning-text">⚠️ Se devolverá el stock al producto.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btnCancelar" class="btn btn-secondary">Cancelar</button>
+                <button id="btnConfirmar" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/ventas.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroStock Analytics - Dashboard</title>
+    <!-- CSS - Las rutas deben tener / al inicio -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-microchip"></i>
+                <h2>ElectroStock</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="/dashboard" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/proveedores" class="nav-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Proveedores</span>
+                </a>
+                <a href="/tiendas" class="nav-item">
+                    <i class="fas fa-store"></i>
+                    <span>Tiendas</span>
+                </a>
+                <a href="/productos" class="nav-item">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+                <a href="/ventas" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="/analisis" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Análisis</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                <div class="header-info">
+                    <span id="fecha-actual"></span>
+                    <span class="estado" id="estado-api">
+                        <i class="fas fa-circle"></i> Conectado
+                    </span>
+                </div>
+            </header>
+
+            <!-- KPIs Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-store"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="total-tiendas">0</h3>
+                        <p>Tiendas</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-box"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="total-productos">0</h3>
+                        <p>Productos</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-truck"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="total-proveedores">0</h3>
+                        <p>Proveedores</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="total-ventas">$0</h3>
+                        <p>Ventas Totales</p>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="total-ganancias">$0</h3>
+                        <p>Ganancias</p>
+                    </div>
+                </div>
+                <div class="kpi-card warning">
+                    <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="kpi-info">
+                        <h3 id="stock-critico">0</h3>
+                        <p>Stock Crítico</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-bar"></i> Ventas por Tienda</h3>
+                    <canvas id="ventasTiendaChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Ganancias por Categoría</h3>
+                    <canvas id="gananciasCategoriaChart"></canvas>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card full-width">
+                    <h3><i class="fas fa-chart-line"></i> Tendencia Mensual de Ventas</h3>
+                    <canvas id="tendenciaMensualChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div class="alertas-section" id="alertas-section">
+                <h3><i class="fas fa-bell"></i> Alertas</h3>
+                <div id="alertas-container"></div>
+            </div>
+
+            <!-- Últimas Ventas -->
+            <div class="table-card">
+                <h3><i class="fas fa-history"></i> Últimas Ventas</h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="ultimas-ventas-table">
+                        <thead>
+                            <tr><th>ID</th><th>Fecha</th><th>Producto</th><th>Tienda</th><th>Cantidad</th><th>Total</th></tr>
+                        </thead>
+                        <tbody id="ultimas-ventas-body">
+                            <tr><td colspan="6">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
